@@ -57,8 +57,10 @@ var store = new TypedTableStore<Car>(tableName: "Cars",
 
 // if you specified createTableIfNotExists: false
 await store.CreateTableIfNotExists();
+```
 
-// Storing
+## Storing
+```csharp
 await store.StoreSingleAsync(new Car {...});
 
 // If you don't want to use the key selectors or your keys aren't derived from the model.
@@ -74,12 +76,56 @@ var car = await store.QuerySingleAsync(new Car {...});
 var car = await store.QuerySingleAsync(partitionKey, rowKey);
 // if (car is null) // handle missing row
 
-
+// or storing multiple
+await store.StoreMultipleAsync(new List<Car> {...} );
+// this will automatically group by partition (using partitionKeySelector), and upload to table storage in batches. Currently there's no API to store multiple items without using key selectors.
 ```
 
 
 >Note that all the non standard properties will be saved under columns named "`__jsonFor_{propertyName}`". As long as the JSON is under the [table storage property limits](https://learn.microsoft.com/en-us/rest/api/storageservices/understanding-the-table-service-data-model#property-types) (about 64 KiB) this will work.
 
+## Querying Multiple Rows
+
 ```csharp
-// Docs WIP
+// Query multiple rows
+var cars=  await store.QueryAsync(new Car { /*specify enough props to infer either partition or row key*/ });
+// selectors will be used to infer the keys
+
+await foreach(var car in rows) {
+  ...
+}
+// or 
+var cars = await store.QueryAsync(partitionKey, rowKey);
+
+```
+If only the partition key was provided (or inferred using `partitionKeySelector(match)`) this will return all the rows in the specified partition.
+
+If only the row key was provided (or inferred using `rowKeySelector(match)`) this will return all the matching rows in each partition.
+
+Calls to Table Storage will be done in batches as the consuming code enumerates the resulting `IAsyncEnumerable`.
+
+## Want the whole table?
+
+```csharp
+var rows = await RetrieveFullTable();
+```
+> If you have a large amount of data in the table, consider partitioning it as this will download the whole table as you enumerate the `IAsyncEnumerable`.
+
+## Deleting
+
+```csharp
+await store.DeleteSingleAsync(car);
+// both keys must be inferrable.
+
+// or 
+await store.DeleteSingleAsync(partitionKey, rowKey);
+
+// delete multiple 
+await DeleteMultipleAsync(new List<Car>{...});
+// all items in the list must be able to infer kets, and all items must be in the same partition.
+
+// or 
+
+await DeleteMultipleInPartitionAsync(partitionKey, new List<string> {/*row keys*/} );
+
 ```
