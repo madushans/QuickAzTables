@@ -141,7 +141,7 @@ await DeleteMultipleInPartitionAsync(partitionKey,
 
 ## Misc
 
-Some other functionality is also available.
+Some other functionality is also available as static functions. These may be useful in some related cases.
 
 - `TableStore.ListTables(...)` lets you list the names of tables.
 - `TableKey.Sanitize(key)` returns a sanitized version of the given input that can be a partition or row key.
