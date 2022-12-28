@@ -71,14 +71,6 @@ await store.StoreSingleAsync(new Car {...}, partitionKey, rowKey);
 // like Car.Owner, this will be JSON serialized and stored 
 // in a property named __jsonFor_Owner
 
-// Querying a single row (Point Query)
-var car = await store.QuerySingleAsync(new Car {...});
-// if (car is null) // handle missing row
-
-// or
-var car = await store.QuerySingleAsync(partitionKey, rowKey);
-// if (car is null) // handle missing row
-
 // or storing multiple
 await store.StoreMultipleAsync(new List<Car> {...} );
 // this will automatically group by partition (using partitionKeySelector), 
@@ -89,6 +81,17 @@ await store.StoreMultipleAsync(new List<Car> {...} );
 
 
 >Note that all the non standard properties will be saved under columns named "`__jsonFor_{propertyName}`". As long as the JSON is under the [table storage property limits](https://learn.microsoft.com/en-us/rest/api/storageservices/understanding-the-table-service-data-model#property-types) (about 64 KiB) this will work.
+
+## Retrive a Single Row (Point Query)
+
+```csharp
+var car = await store.QuerySingleAsync(new Car {...});
+// if (car is null) // handle missing row
+
+// or
+var car = await store.QuerySingleAsync(partitionKey, rowKey);
+// if (car is null) // handle missing row
+```
 
 ## Querying Multiple Rows
 
