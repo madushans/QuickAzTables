@@ -138,3 +138,11 @@ await DeleteMultipleInPartitionAsync(partitionKey,
   new List<string> {/*row keys*/} );
 
 ```
+
+## Misc
+
+Some other functionality is also available.
+
+- `TableStore.ListTables(...)` lets you list the names of tables.
+- `TableKey.Sanitize(key)` returns a sanitized version of the given input that can be a partition or row key.
+- `TableKey.Validate(key)` returns a string explaining why the given string would fail as a partition or row key (or `null` if it is a valid key). Note that this checks if the actual number of bytes for the input exceeds the 1KiB limit, so avoid passing large strings to this for perf reasons.
