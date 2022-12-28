@@ -3,9 +3,22 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        
+        <PackageOutputPath>./bin/nupkg</PackageOutputPath>
+        <Version>0.0.1</Version>
     </PropertyGroup>
     <ItemGroup>
 	    <PackageReference Include="Azure.Data.Tables" Version="12.7.1" />
 	    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     </ItemGroup>
+
+    <PropertyGroup>
+        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+        <Authors>Madushan</Authors>
+        <Description>Dotnet Tool to visualize or export project and package dependencies.</Description>
+        <PackageTags>Azure, Table Storage, Beginner</PackageTags>
+        <RepositoryUrl>https://github.com/madushans/QuickAzTables</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/madushans/QuickAzTables</PackageProjectUrl>
+      </PropertyGroup>
+    
 </Project>
