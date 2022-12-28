@@ -63,10 +63,13 @@ await store.CreateTableIfNotExists();
 ```csharp
 await store.StoreSingleAsync(new Car {...});
 
-// If you don't want to use the key selectors or your keys aren't derived from the model.
+// If you don't want to use the key selectors or your keys 
+// aren't derived from the model.
 
 await store.StoreSingleAsync(new Car {...}, partitionKey, rowKey);
-// this stores in the table. If you have a nested model like Car.Owner, this will be JSON serialized and stored in a property named __jsonFor_Owner
+// this stores in the table. If you have a nested model 
+// like Car.Owner, this will be JSON serialized and stored 
+// in a property named __jsonFor_Owner
 
 // Querying a single row (Point Query)
 var car = await store.QuerySingleAsync(new Car {...});
@@ -78,7 +81,10 @@ var car = await store.QuerySingleAsync(partitionKey, rowKey);
 
 // or storing multiple
 await store.StoreMultipleAsync(new List<Car> {...} );
-// this will automatically group by partition (using partitionKeySelector), and upload to table storage in batches. Currently there's no API to store multiple items without using key selectors.
+// this will automatically group by partition (using partitionKeySelector), 
+// and upload to table storage in batches. Currently 
+// there's no API to store multiple items without 
+// using key selectors.
 ```
 
 
@@ -88,7 +94,8 @@ await store.StoreMultipleAsync(new List<Car> {...} );
 
 ```csharp
 // Query multiple rows
-var cars=  await store.QueryAsync(new Car { /*specify enough props to infer either partition or row key*/ });
+var cars=  await store.QueryAsync(new Car { /*specify 
+enough props to infer either partition or row key*/ });
 // selectors will be used to infer the keys
 
 await foreach(var car in rows) {
@@ -122,10 +129,12 @@ await store.DeleteSingleAsync(partitionKey, rowKey);
 
 // delete multiple 
 await DeleteMultipleAsync(new List<Car>{...});
-// all items in the list must be able to infer kets, and all items must be in the same partition.
+// all items in the list must be able to infer keys, 
+// and all items must be in the same partition.
 
 // or 
 
-await DeleteMultipleInPartitionAsync(partitionKey, new List<string> {/*row keys*/} );
+await DeleteMultipleInPartitionAsync(partitionKey, 
+  new List<string> {/*row keys*/} );
 
 ```
