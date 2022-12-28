@@ -5,8 +5,8 @@ namespace QuickAzTables
     public class TypedTableStore<T> where T : class, new()
     {
         private readonly TableStore store;
-        private readonly Func<T, string> partitionKeySelector;
-        private readonly Func<T, string> rowKeySelector;
+        private readonly Func<T, string>? partitionKeySelector;
+        private readonly Func<T, string>? rowKeySelector;
 
         /// <summary>
         /// Creates an instance that allows to store and query a given 
@@ -39,13 +39,15 @@ namespace QuickAzTables
         /// </param>
         public TypedTableStore(string tableName,
                                string connectionString,
-                               Func<T, string> partitionKeySelector,
-                               Func<T, string> rowKeySelector,
+                               Func<T, string>? partitionKeySelector,
+                               Func<T, string>? rowKeySelector,
                                bool createTableIfNotExists = true,
                                string invalidKeyCharReplacement = "")
         {
-            ArgumentNullException.ThrowIfNull(partitionKeySelector);
-            ArgumentNullException.ThrowIfNull(rowKeySelector);
+            // Allow specifying null so the versions with explictly specifying keys
+            // can still work.
+            //ArgumentNullException.ThrowIfNull(partitionKeySelector);
+            //ArgumentNullException.ThrowIfNull(rowKeySelector);
 
             store = new TableStore(tableName,
                                    connectionString,
@@ -203,6 +205,9 @@ namespace QuickAzTables
         /// </summary>
         public async Task StoreSingleAsync(T item)
         {
+            if (partitionKeySelector is null || rowKeySelector is null)
+                throw new InvalidOperationException($"To store using the typed object, both {nameof(partitionKeySelector)} and {nameof(rowKeySelector)} must be specified in the constructor.");
+
             if (item is null) throw new ArgumentNullException(nameof(item));
 
             string partitionKey = partitionKeySelector(item);
@@ -240,6 +245,9 @@ namespace QuickAzTables
         /// </summary>
         public async Task StoreMultipleAsync(List<T> items)
         {
+            if (partitionKeySelector is null || rowKeySelector is null)
+                throw new InvalidOperationException($"To store using the typed object, both {nameof(partitionKeySelector)} and {nameof(rowKeySelector)} must be specified in the constructor.");
+
             if (items is null) throw new ArgumentNullException(nameof(items));
 
             var dynamicEntityPartitions = items
@@ -263,6 +271,9 @@ namespace QuickAzTables
         /// </summary>
         public async Task DeleteSingleAsync(T match)
         {
+            if (partitionKeySelector is null || rowKeySelector is null)
+                throw new InvalidOperationException($"To store using the typed object, both {nameof(partitionKeySelector)} and {nameof(rowKeySelector)} must be specified in the constructor.");
+
             var partitionKey = partitionKeySelector(match);
             var rowKey = rowKeySelector(match);
             await DeleteSingleAsync(partitionKey, rowKey);
@@ -290,6 +301,9 @@ namespace QuickAzTables
         /// </summary>
         public async Task DeleteMultipleAsync(List<T> matches)
         {
+            if (partitionKeySelector is null || rowKeySelector is null)
+                throw new InvalidOperationException($"To store using the typed object, both {nameof(partitionKeySelector)} and {nameof(rowKeySelector)} must be specified in the constructor.");
+
             var partitions = matches.Select(m => new
             {
                 partitionKey = partitionKeySelector(m),
