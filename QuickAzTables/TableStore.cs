@@ -202,7 +202,7 @@ namespace QuickAzTables
             item.PartitionKey = partitionKey;
             item.RowKey = rowKey;
 
-            var response = await GetTable().UpsertEntityAsync(item);
+            var response = await GetTable().UpsertEntityAsync(item, TableUpdateMode.Merge);
 
             ThrowIfErrorResponse(response,
                                  partitionKey: partitionKey,
