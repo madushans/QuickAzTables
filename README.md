@@ -35,6 +35,23 @@ public class Owner {
 
 ```
 
+## API
+ 
+ - **Store**
+   - [`StoreSingleAsync`](#store-single-row)
+   - [`StoreMultipleAsync`](#storing-multiple-rows) 
+ - **Query**
+   - [`QuerySingleAsync`](#retrieve-a-single-row-point-query)
+   - [`QueryAsync`](#retrieve-multiple-rows)
+   - [`RetrieveFullTable`](#want-the-whole-table)
+ - **Delete**
+   - [`DeleteSingleAsync`](#deleting-a-single-row)
+   - [`DeleteMultipleAsync`](#deleting-multiple-rows)
+   - [`DeleteMultipleInPartitionAsync`](#deleting-multiple-rows)
+ - **[Other Misc APIs](#misc)**
+
+
+
 ## Initialization
 
 First [install the latest package version](https://www.nuget.org/packages/QuickAzTables/) on your project.
@@ -90,13 +107,13 @@ When calling this, the library does a few sensible (but slightly opinonated) thi
 - the `partitionKeySelector` and `rowKeySelector` provided in the initialization is used to infer those keys. (unless you specify them like in the second call)
   - If keys returned from them were invalid, i.e contains invalid characters, they're replaced with `invalidKeyCharReplacement` provided in the initialization.
   - If the key is too long, it is truncated at 1024 chars. (Table Storage keys must be 1KiB or less. We assume your key only has ASCII characters.)
-  - Values of your priginal properties (`PlateNo` and `City`) are not modified.
+  - Values of your original properties (`PlateNo` and `City`) are not modified.
   - Note that you cannot return `null` or `""` as keys. This will throw an exception.
 
 - Your item is sent to Table Storage, in an `Upsert` operation with `mode` set to `TableUpdateMode.Merge`.
   - Creates the entity if it doesn't exist,
   - Updates if it does,
-    - overwrites overwriting any matching properties,
+    - overwrites any matching properties,
     - and keeps any non-matching ones as is.
  - If your model had a property Table Storage doesn't natively support, like the `Owner` property in the example, they get JSON serialized, into a column named `__jsonFor_{propertyName}`. For `Owner` this is `__jsonFor_Owner`. 
    - If you read back the rows using this library, these are populated in the result correctly as well.
@@ -132,7 +149,7 @@ var match = new Car {
   PlateNo = "ABC123",
   City = "Westview"
 }
-var car = await store.QuerySingleAsync(march);
+var car = await store.QuerySingleAsync(match);
 if (car is null) // handle missing row
 
 // or
@@ -140,7 +157,7 @@ var car = await store.QuerySingleAsync(partitionKey, rowKey);
 if (car is null) // handle missing row
 ```
 
-## Querying Multiple Rows
+## Retrieve Multiple Rows
 
 ```csharp
 var match = new Car { 
