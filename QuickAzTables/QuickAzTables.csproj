@@ -5,7 +5,7 @@
         <Nullable>enable</Nullable>
         
         <PackageOutputPath>./bin/nupkg</PackageOutputPath>
-        <Version>0.0.3</Version>
+        <Version>0.0.4</Version>
     </PropertyGroup>
     <ItemGroup>
 	    <PackageReference Include="Azure.Data.Tables" Version="12.7.1" />
@@ -13,17 +13,28 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <Authors>Madushan</Authors>
-        <Description>Dotnet Tool to visualize or export project and package dependencies.</Description>
+        <Description>Opinionated and minimal library to allow quick and easy use of Azure Table Storage with minimal code.</Description>
         <PackageTags>Azure, Table Storage, Beginner</PackageTags>
         <RepositoryUrl>https://github.com/madushans/QuickAzTables</RepositoryUrl>
         <PackageProjectUrl>https://github.com/madushans/QuickAzTables</PackageProjectUrl>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Title>Quick Az Tables</Title>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
       </PropertyGroup>
       <ItemGroup>
-        <None Include="LICENSE.txt" Pack="true" PackagePath="" />
+        <None Include="..\README.md">
+          <Pack>True</Pack>
+          <PackagePath>\</PackagePath>
+        </None>
+		  <None Include="..\LICENSE">
+			  <Pack>True</Pack>
+			  <PackagePath>\</PackagePath>
+		  </None>
       </ItemGroup>
     
 </Project>
