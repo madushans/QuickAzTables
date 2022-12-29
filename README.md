@@ -8,9 +8,9 @@ Prime use case is storing and retrieving strongly typed Dotnet objects in table 
 ## CI/CD Status
 | | |
 |-|-|
-| Main Build | [![Build Status](https://dev.azure.com/madushan/QuickAzTables/_apis/build/status/madushans.QuickAzTables?branchName=main)](https://dev.azure.com/madushan/QuickAzTables/_build/latest?definitionId=14&branchName=main)|
-|Nuget Release |[![Publish Status](https://vsrm.dev.azure.com/madushan/_apis/public/Release/badge/8338fdff-7f34-4674-862f-772040e6a8da/1/1)](https://vsrm.dev.azure.com/madushan/_apis/public/Release/badge/8338fdff-7f34-4674-862f-772040e6a8da/1/1)|
-| Nuget | [Get Latest](https://www.nuget.org/packages/QuickAzTables/)
+| **Build** | [![Build Status](https://dev.azure.com/madushan/QuickAzTables/_apis/build/status/madushans.QuickAzTables?branchName=main)](https://dev.azure.com/madushan/QuickAzTables/_build/latest?definitionId=14&branchName=main)|
+|**Release** |[![Publish Status](https://vsrm.dev.azure.com/madushan/_apis/public/Release/badge/8338fdff-7f34-4674-862f-772040e6a8da/1/1)](https://vsrm.dev.azure.com/madushan/_apis/public/Release/badge/8338fdff-7f34-4674-862f-772040e6a8da/1/1)|
+| **Nuget** | [![Nuget Badge](https://buildstats.info/nuget/QuickAzTables)](https://www.nuget.org/packages/QuickAzTables)
 
 
 ## *Have Questions? Check the [FAQ](FAQ.md) or open an issue.*
