@@ -23,7 +23,7 @@ namespace QuickAzTables
         /// <param name="connectionString">connection string to the table storage account</param>
         /// <param name="createTableIfNotExists">
         /// Whether to create the table if not exists. If set to <see langword="false"/> 
-        /// the table can be created using <see cref="CreateTableIfNotExists"/> at a 
+        /// the table can be created using <see cref="CreateTableIfNotExistsAsync"/> at a 
         /// later time, but before other operations. If set to <see langword="true"/> 
         /// (default) you're expected to make sure either there's only one instance for 
         /// a given table is used, or constructors are called with enough time in between,
@@ -68,7 +68,7 @@ namespace QuickAzTables
         /// <param name="accountName">table storage account name</param>
         /// <param name="createTableIfNotExists">
         /// Whether to create the table if not exists. If set to <see langword="false"/> 
-        /// the table can be created using <see cref="CreateTableIfNotExists"/> at a 
+        /// the table can be created using <see cref="CreateTableIfNotExistsAsync"/> at a 
         /// later time, but before other operations. If set to <see langword="true"/> 
         /// (default) you're expected to make sure either there's only one instance for 
         /// a given table is used, or constructors are called with enough time in between,
@@ -112,7 +112,7 @@ namespace QuickAzTables
         /// to return a <code>Conflict</code> error. You're expected to synchronize calls to avoid this.
         /// </summary>
         /// <returns></returns>
-        public Task CreateTableIfNotExists() => GetTable().CreateIfNotExistsAsync();
+        public Task CreateTableIfNotExistsAsync() => GetTable().CreateIfNotExistsAsync();
 
         /// <summary>
         /// Queries table storage with the given <paramref name="partitionKey"/> and
