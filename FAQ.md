@@ -7,7 +7,7 @@ Ultimately, yes its just data in Table Storage. You will however, have to accoun
 If you do it right, yes. Make sure your partition and row keys don't conflict.
 In this case, it is also advised that you set `createTableIfNotExists: false` and call `await CreateTableIfNotExistsAsync()` on one of them. You can call on both, as long as you call them after the previous call completed. This matters only when the table doesn't exist.
 
-## How to use ETag, If-Match Queries .etc. ?
+## **How to use ETag, If-Match Queries .etc.?**
 If you need these features, you should use the official SDK directly. This library is only for simpler use cases. If you have a feature request that you think is simple and common, please open an issue and I can consider adding the functionality.
 
 ## **Found a Bug. What do I do?**
