@@ -20,5 +20,8 @@
         <RepositoryUrl>https://github.com/madushans/QuickAzTables</RepositoryUrl>
         <PackageProjectUrl>https://github.com/madushans/QuickAzTables</PackageProjectUrl>
       </PropertyGroup>
+      <ItemGroup>
+        <None Include="LICENSE.txt" Pack="true" PackagePath="" />
+      </ItemGroup>
     
 </Project>
