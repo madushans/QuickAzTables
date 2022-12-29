@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <Authors>Madushan</Authors>
         <Description>Dotnet Tool to visualize or export project and package dependencies.</Description>
         <PackageTags>Azure, Table Storage, Beginner</PackageTags>
