@@ -8,12 +8,12 @@ Prime use case is storing and retrieving strongly typed Dotnet objects in table 
 ## CI/CD Status
 | | |
 |-|-|
-| **Build** | [![Build Status](https://dev.azure.com/madushan/QuickAzTables/_apis/build/status/madushans.QuickAzTables?branchName=main)](https://dev.azure.com/madushan/QuickAzTables/_build/latest?definitionId=14&branchName=main)|
-|**Release** |[![Publish Status](https://vsrm.dev.azure.com/madushan/_apis/public/Release/badge/8338fdff-7f34-4674-862f-772040e6a8da/1/1)](https://vsrm.dev.azure.com/madushan/_apis/public/Release/badge/8338fdff-7f34-4674-862f-772040e6a8da/1/1)|
+| **Build** | ![Build Status](https://dev.azure.com/madushan/QuickAzTables/_apis/build/status/madushans.QuickAzTables?branchName=main)|
+|**Release** |![Publish Status](https://vsrm.dev.azure.com/madushan/_apis/public/Release/badge/8338fdff-7f34-4674-862f-772040e6a8da/1/1)|
 | **Nuget** | [![Nuget Badge](https://buildstats.info/nuget/QuickAzTables)](https://www.nuget.org/packages/QuickAzTables)
 
 
-## *Have Questions? Check the [FAQ](FAQ.md) or open an issue.*
+## *Have Questions? Check the [FAQ](docs/FAQ.md) or open an issue.*
 ## *Found Bugs? Feature Requests? Open an issue. PRs also welcome.*
 
 # Get Started 
@@ -87,6 +87,15 @@ await store.CreateTableIfNotExistsAsync();
 You're expected to make sure that only one call is made "at a time" to `CreateTableIfNotExistsAsync` or to the constructor if `createTableIfNotExists: true` (default). If you call them concurrently and the table doesn't exist, Table Storage will respond with `Conflict` as it tries to create the table while its creating the table.
 
 This only happens if the table was actually not present and we create the table. If you maintain a single `TypedTableStore` instance per table from your application, you do not have to worry about this issue.
+
+---
+
+## Using ASP.NET ?
+See the **[ASP.NET Integration Guide](docs/AspNetIntegration.md)** if you'd like to inject table store into your services/controllers.
+
+There is also a [bare bones sample](samples/QuickAzTables.AspNetIntegrationBasic/) available.
+
+---
 
 ## Store Single Row
 
