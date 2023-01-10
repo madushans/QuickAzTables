@@ -41,10 +41,10 @@ namespace QuickAzTables
                           bool createTableIfNotExists = true,
                           string invalidKeyCharReplacement = "")
         {
-            if (!string.IsNullOrWhiteSpace(tableName))
+            if (string.IsNullOrWhiteSpace(tableName))
                 throw new InvalidOperationException($"{nameof(tableName)} cannot be null or empty");
             
-            if (!string.IsNullOrWhiteSpace(connectionString))
+            if (string.IsNullOrWhiteSpace(connectionString))
                 throw new InvalidOperationException($"{nameof(connectionString)} cannot be null or empty");
 
             ArgumentNullException.ThrowIfNull(invalidKeyCharReplacement);
@@ -88,10 +88,10 @@ namespace QuickAzTables
                           bool createTableIfNotExists = true,
                           string invalidKeyCharReplacement = "")
         {
-            if (!string.IsNullOrWhiteSpace(sasToken))
+            if (string.IsNullOrWhiteSpace(sasToken))
                 throw new InvalidOperationException($"{nameof(sasToken)} cannot be null or empty");
 
-            if (!string.IsNullOrWhiteSpace(accountName))
+            if (string.IsNullOrWhiteSpace(accountName))
                 throw new InvalidOperationException($"{nameof(accountName)} cannot be null or empty");
 
             ArgumentNullException.ThrowIfNull(invalidKeyCharReplacement);
