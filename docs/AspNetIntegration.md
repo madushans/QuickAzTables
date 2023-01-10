@@ -76,7 +76,7 @@ public class CarController {
 
     [HttpGet]
     public async Task<IActionResult> Get(string plateNo, string city) {
-        var car = await store.QuerySingleAsync(city, plateNo);
+        var car = await _store.QuerySingleAsync(city, plateNo);
         if (car is null) return NotFound();
         
         return car;
