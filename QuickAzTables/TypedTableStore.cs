@@ -10,7 +10,7 @@ namespace QuickAzTables
 
         /// <summary>
         /// Creates an instance that allows to store and query a given 
-        /// Table Storage table with the shape of the type <see cref="T"/>
+        /// Table Storage table with the shape of the type <typeparamref name="T"/>
         /// </summary>
         /// <param name="tableName">Name of the table this object should use</param>
         /// <param name="connectionString">connection string to the table storage account</param>
@@ -30,11 +30,11 @@ namespace QuickAzTables
         /// See methods on <see cref="TableKey"/> class
         /// </param>
         /// <param name="partitionKeySelector">
-        /// Function that given an instance of <see cref="T"/> 
+        /// Function that given an instance of <typeparamref name="T"/>
         /// returns its partition key
         /// </param>
         /// <param name="rowKeySelector">
-        /// Function that given an instance of <see cref="T"/> 
+        /// Function that given an instance of <typeparamref name="T"/>
         /// returns its row key
         /// </param>
         public TypedTableStore(string tableName,
@@ -61,7 +61,7 @@ namespace QuickAzTables
 
         /// <summary>
         /// Creates an instance that allows to store and query a given 
-        /// Table Storage table with the shape of the type <see cref="T"/>
+        /// Table Storage table with the shape of the type <typeparamref name="T"/>
         /// </summary>
         /// <param name="tableName">Name of the table this object should use</param>
         /// <param name="sasToken">SAS Token to the table storage account</param>
@@ -82,11 +82,11 @@ namespace QuickAzTables
         /// See methods on <see cref="TableKey"/> class
         /// </param>
         /// <param name="partitionKeySelector">
-        /// Function that given an instance of <see cref="T"/> 
+        /// Function that given an instance of <typeparamref name="T"/>
         /// returns its partition key
         /// </param>
         /// <param name="rowKeySelector">
-        /// Function that given an instance of <see cref="T"/> 
+        /// Function that given an instance of <typeparamref name="T"/>
         /// returns its row key
         /// </param>
         public TypedTableStore(string tableName,
@@ -149,8 +149,8 @@ namespace QuickAzTables
         /// Infers the partition and row keys from the specified <paramref name="match"/>
         /// and queries table storage for matching records. Atleast one key must be inferrable
         /// from the <paramref name="match"/>.
-        /// If only <paramref name="partitionKey"/> was inferred, this will result in a 
-        /// partition scan. If only <paramref name="rowKey"/> was inferred this will result in 
+        /// If only <see name="partitionKey"/> was inferred, this will result in a 
+        /// partition scan. If only <see name="rowKey"/> was inferred this will result in 
         /// a table scan. If you're looking for a single row, you can use 
         /// <see cref="QuerySingleAsync(T)"/> or <see cref="QuerySingleAsync(string, string)"/> 
         /// instead.
