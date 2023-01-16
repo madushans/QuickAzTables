@@ -3,6 +3,7 @@ using Azure.Data.Tables;
 using Azure.Data.Tables.Models;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace QuickAzTables
 {
@@ -81,7 +82,6 @@ namespace QuickAzTables
         /// Default is <code>""</code> which removed the invalid characters. 
         /// See methods on <see cref="TableKey"/> class
         /// </param>
-
         public TableStore(string tableName,
                           string sasToken,
                           string accountName,
@@ -111,17 +111,17 @@ namespace QuickAzTables
         /// Note that running this operation on the same table at the same time will cause Table Storage 
         /// to return a <code>Conflict</code> error. You're expected to synchronize calls to avoid this.
         /// </summary>
-        /// <returns></returns>
-        public Task CreateTableIfNotExistsAsync() => GetTable().CreateIfNotExistsAsync();
+        public Task CreateTableIfNotExistsAsync(CancellationToken cancellationToken = default) 
+            => GetTable().CreateIfNotExistsAsync(cancellationToken: cancellationToken);
 
         /// <summary>
         /// Queries table storage with the given <paramref name="partitionKey"/> and
         /// <paramref name="rowKey"/> and returns the matching record if exists.
         /// <see langword="null"/> otherwise. 
-        /// If you want multiple rows in the result see <see cref="QueryAsync(string?, string?)"/>
+        /// If you want multiple rows in the result see <see cref="QueryAsync(string?, string?, CancellationToken)"/>
         /// The keys will be sanitized before calling Table Storage.
         /// </summary>
-        public async Task<TableEntity?> QuerySingleAsync(string partitionKey, string rowKey)
+        public async Task<TableEntity?> QuerySingleAsync(string partitionKey, string rowKey, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(partitionKey) || string.IsNullOrWhiteSpace(rowKey))
                 throw new ArgumentException(
@@ -129,7 +129,7 @@ namespace QuickAzTables
                     $"To match multiple rows by only one of them, use {nameof(QueryAsync)} instead. " +
                     $"To retrieve the full table, use {nameof(RetrieveFullTable)} instead.");
 
-            await foreach (var item in QueryAsync(partitionKey, rowKey))
+            await foreach (var item in QueryAsync(partitionKey, rowKey, cancellationToken: cancellationToken))
             {
                 return item;
             }
@@ -141,11 +141,12 @@ namespace QuickAzTables
         /// <paramref name="rowKey"/>. If only <paramref name="partitionKey"/> was 
         /// specified this will result in a partition scan. If only <paramref name="rowKey"/>
         /// was specified this will result in a table scan. If you're looking for a single
-        /// row, you can use <see cref="QuerySingleAsync(string, string)"/> instead.
+        /// row, you can use <see cref="QuerySingleAsync(string, string, CancellationToken)"/> instead.
         /// The keys will be sanitized before calling Table Storage.
         /// </summary>
         public IAsyncEnumerable<TableEntity> QueryAsync(string? partitionKey = null,
-                                                               string? rowKey = null)
+                                                        string? rowKey = null,
+                                                        CancellationToken cancellationToken = default)
         {
             partitionKey = TableKey.Sanitize(partitionKey, invalidKeyCharReplacement);
             rowKey = TableKey.Sanitize(rowKey, invalidKeyCharReplacement);
@@ -154,19 +155,23 @@ namespace QuickAzTables
                     $"Atleast one must be provided. " +
                     $"To retrive the entire table, explicitly invoke {nameof(RetrieveFullTable)}()");
 
-            return ExecuteQuerySegmented(partitionKey, rowKey);
+            return ExecuteQuerySegmented(partitionKey, rowKey, cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// Returns all rows in the table. While the data is paged/segmented, use this 
         /// sparingly as this can result in a large dataset if your table is large.
         /// </summary>
-        public IAsyncEnumerable<TableEntity> RetrieveFullTable()
+        public IAsyncEnumerable<TableEntity> RetrieveFullTable(CancellationToken cancellationToken = default)
         {
-            return ExecuteQuerySegmented(partitionKey: null, rowKey: null);
+            return ExecuteQuerySegmented(partitionKey: null,
+                                         rowKey: null,
+                                         cancellationToken: cancellationToken);
         }
 
-        private async IAsyncEnumerable<TableEntity> ExecuteQuerySegmented(string? partitionKey, string? rowKey)
+        private async IAsyncEnumerable<TableEntity> ExecuteQuerySegmented(string? partitionKey,
+                                                                          string? rowKey,
+                                                                          [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             var querySegments = new[]
             {
@@ -178,7 +183,7 @@ namespace QuickAzTables
             // Remember the same/similar experince in last 2 versions of table SDKs.
             // Ain't got time or the interest to figure out why the API doesn't work
             // as expected, so using odata string version
-            var queryResults = GetTable().QueryAsync<TableEntity>(filter);
+            var queryResults = GetTable().QueryAsync<TableEntity>(filter, cancellationToken: cancellationToken);
             await foreach (var item in queryResults)
             {
                 yield return item;
@@ -189,7 +194,10 @@ namespace QuickAzTables
         /// Stores the given item in the storage against the specified keys.
         /// The keys will be sanitized before calling Table Storage.
         /// </summary>
-        public async Task StoreSingleAsync(TableEntity item, string partitionKey, string rowKey)
+        public async Task StoreSingleAsync(TableEntity item,
+                                           string partitionKey,
+                                           string rowKey,
+                                           CancellationToken cancellationToken = default)
         {
             if (item is null) throw new ArgumentNullException(nameof(item));
 
@@ -202,7 +210,7 @@ namespace QuickAzTables
             item.PartitionKey = partitionKey;
             item.RowKey = rowKey;
 
-            var response = await GetTable().UpsertEntityAsync(item, TableUpdateMode.Merge);
+            var response = await GetTable().UpsertEntityAsync(item, TableUpdateMode.Merge, cancellationToken: cancellationToken);
 
             ThrowIfErrorResponse(response,
                                  partitionKey: partitionKey,
@@ -216,7 +224,9 @@ namespace QuickAzTables
         /// executed as a batched Entity Group Transaction.
         /// The keys will be sanitized before calling Table Storage.
         /// </summary>
-        public async Task StoreMultipleInPartitionAsync(List<TableEntity> items, string partitionKey)
+        public async Task StoreMultipleInPartitionAsync(List<TableEntity> items,
+                                                        string partitionKey,
+                                                        CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(items);
             if (string.IsNullOrWhiteSpace(partitionKey)) throw new ArgumentException($"'{nameof(partitionKey)}' cannot be null or whitespace", nameof(partitionKey));
@@ -233,32 +243,36 @@ namespace QuickAzTables
                                                              entity))
                 .ToList();
 
-            var batchResult = await GetTable().SubmitTransactionAsync(batch);
+            var batchResult = await GetTable().SubmitTransactionAsync(batch, cancellationToken: cancellationToken);
 
             ThrowIfErrorResponse(batchResult.GetRawResponse(), partitionKey: partitionKey);
         }
 
         private static void ThrowIfErrorResponse(Response response,
-                                          string partitionKey,
-                                          string? rowKey = null,
-                                          [CallerMemberName] string? operationName = null)
+                                                 string partitionKey,
+                                                 string? rowKey = null,
+                                                 [CallerMemberName] string? operationName = null)
         {
             if (!response.IsError) return;
-            throw new Exception($"{operationName} for {nameof(partitionKey)} '{partitionKey}'{(rowKey is null ? "" : $" {nameof(rowKey)} '{rowKey}'")} failed with {response.Status} - {response.ReasonPhrase}");
+            throw new Exception($"{operationName} for {nameof(partitionKey)} '{partitionKey}'{(rowKey is null ? "" : $" and {nameof(rowKey)} '{rowKey}'")} failed with {response.Status} - {response.ReasonPhrase}");
         }
 
         /// <summary>
         /// Deletes the row identified by provided keys.
         /// The keys will be sanitized before calling Table Storage.
         /// </summary>
-        public async Task DeleteSingleAsync(string partitionKey, string rowKey)
+        public async Task DeleteSingleAsync(string partitionKey,
+                                            string rowKey,
+                                            CancellationToken cancellationToken = default)
         {
             partitionKey = TableKey.Sanitize(partitionKey, invalidKeyCharReplacement);
             rowKey = TableKey.Sanitize(rowKey, invalidKeyCharReplacement);
             if (string.IsNullOrWhiteSpace(partitionKey)) throw new ArgumentException($"'{nameof(partitionKey)}' cannot be null or whitespace", nameof(partitionKey));
             if (string.IsNullOrWhiteSpace(rowKey)) throw new ArgumentException($"'{nameof(rowKey)}' cannot be null or whitespace", nameof(rowKey));
 
-            var response = await GetTable().DeleteEntityAsync(partitionKey, rowKey);
+            var response = await GetTable().DeleteEntityAsync(partitionKey,
+                                                              rowKey,
+                                                              cancellationToken: cancellationToken);
             
             ThrowIfErrorResponse(response,
                                  partitionKey: partitionKey,
@@ -271,7 +285,9 @@ namespace QuickAzTables
         /// executed as a batched Entity Group Transaction.
         /// The keys will be sanitized before calling Table Storage.
         /// </summary>
-        public async Task DeleteMultipleInPartitionAsync(string partitionKey, List<string> rowKeys)
+        public async Task DeleteMultipleInPartitionAsync(string partitionKey,
+                                                         List<string> rowKeys,
+                                                         CancellationToken cancellationToken = default)
         {
             partitionKey = TableKey.Sanitize(partitionKey, invalidKeyCharReplacement);
             ArgumentNullException.ThrowIfNull(rowKeys);
@@ -285,7 +301,7 @@ namespace QuickAzTables
               .Select(rowKey => new TableTransactionAction(TableTransactionActionType.Delete, new TableEntity(partitionKey, rowKey)))
               .ToList();
 
-            var batchResult = await GetTable().SubmitTransactionAsync(batch);
+            var batchResult = await GetTable().SubmitTransactionAsync(batch, cancellationToken: cancellationToken);
 
             ThrowIfErrorResponse(batchResult.GetRawResponse(),
                                  partitionKey: partitionKey);
@@ -304,14 +320,18 @@ namespace QuickAzTables
         /// Lists the names of tables in the specified table storage account
         /// </summary>
         public static IList<string> ListTables(string connectionString,
-                                               Expression<Func<TableItem, bool>>? filter = null)
+                                               Expression<Func<TableItem, bool>>? filter = null,
+                                               CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentException($"{nameof(connectionString)} must be specified and cannot be empty.");
 
             var service = new TableServiceClient(connectionString);
             filter ??= t => true;
 
-            return service.Query(filter).Select(t => t.Name).ToList();
+            return service
+                .Query(filter,cancellationToken: cancellationToken)
+                .Select(t => t.Name)
+                .ToList();
         }
 
         /// <summary>
@@ -319,7 +339,8 @@ namespace QuickAzTables
         /// </summary>
         public static IList<string> ListTables(string sasToken,
                                                string accountName,
-                                               Expression<Func<TableItem, bool>>? filter = null)
+                                               Expression<Func<TableItem, bool>>? filter = null,
+                                               CancellationToken cancellationToken = default)
         {
             if(string.IsNullOrWhiteSpace(sasToken)) throw new ArgumentException($"{nameof(sasToken)} must be specified and cannot be empty.");
             if (string.IsNullOrWhiteSpace(accountName)) throw new ArgumentException($"{nameof(accountName)} must be specified and cannot be empty.");
@@ -327,7 +348,10 @@ namespace QuickAzTables
             var service = new TableServiceClient(new Uri($"https://{accountName}.table.core.windows.net"), new AzureSasCredential(sasToken!));
             filter ??= t => true;
 
-            return service.Query(filter).Select(t => t.Name).ToList();
+            return service
+                .Query(filter, cancellationToken: cancellationToken)
+                .Select(t => t.Name)
+                .ToList();
         }
     }
 }
